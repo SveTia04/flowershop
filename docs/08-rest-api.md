@@ -216,29 +216,32 @@ Authorization: Bearer eyJhbGci... (длинная строка-токен)
 
 ```mermaid
 flowchart LR
-    subgraph Клиенты
-      C1[Браузер]
-      C2[Postman / curl]
-      C3[Мобильное приложение]
+    subgraph clients["Клиенты"]
+        C1["Браузер"]
+        C2["Postman / curl"]
+        C3["Мобильное приложение"]
     end
 
-    C1 & C2 & C3 -->|"HTTP-запрос: метод+путь+JSON+токен"| SRV
+    C1 -->|"HTTP-запрос"| SRV
+    C2 -->|"HTTP-запрос"| SRV
+    C3 -->|"HTTP-запрос"| SRV
 
-    subgraph Сервер на C++ (наш проект)
-      SRV[httplib::Server<br/>принял соединение]
-      CTRL[Контроллер<br/>ProductController / OrderController]
-      SVC[Сервис<br/>OrderService / StockService]
-      REPO[Репозиторий<br/>OrderRepository ...]
-      SRV --> CTRL
-      CTRL -->|C++-объект| SVC
-      SVC --> REPO
+    subgraph server["Сервер на C++ (наш проект)"]
+        SRV["httplib::Server<br/>принял соединение"]
+        CTRL["Контроллер<br/>ProductController / OrderController"]
+        SVC["Сервис<br/>OrderService / StockService"]
+        REPO["Репозиторий<br/>OrderRepository"]
+
+        SRV --> CTRL
+        CTRL -->|C++ объект| SVC
+        SVC --> REPO
     end
 
-    REPO -->|SQL| DB[(SQLite<br/>flowershop.db)]
-    DB -->|строки| REPO
-    REPO -->|объект| SVC
-    SVC -->|объект| CTRL
-    CTRL -->|"HTTP-ответ: код + JSON"| C1
+    REPO -->|SQL| DB["SQLite<br/>flowershop.db"]
+    DB --> REPO
+    REPO --> SVC
+    SVC --> CTRL
+    CTRL -->|"HTTP-ответ"| C1
 ```
 
 **ASCII-дубликат:**
